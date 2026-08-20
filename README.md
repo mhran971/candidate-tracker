@@ -39,6 +39,21 @@ candidate-tracker/
 ### Decision 4: Soft Delete for Candidates with Query Filtering
 - **Choice**: Candidates have `deleted_at` timestamp. Queries filter `deleted_at IS NULL` to exclude soft-deleted candidates while preserving historical application relations.
 
+### Decision 5: Schema-First Route Definition with Type Provider
+- **Choice**: Used `fastify-type-provider-zod` with route handlers split per operation (`create.ts`, `list.ts`, `get.ts`, `update.ts`, `delete.ts`).
+- **Rationale**: Keeps each endpoint modular, isolated, readable, and 100% type-safe from request body/query to response envelope.
+
+---
+
+## 📡 API Endpoints Matrix
+
+### Candidates (`/api/candidates`)
+- `POST /api/candidates` — Create candidate (validates email uniqueness, returns 201 / 409)
+- `GET /api/candidates` — Paginated list with multi-field search (`name`, `email`, `location`, `phone`)
+- `GET /api/candidates/:id` — Candidate profile with all associated applications
+- `PATCH /api/candidates/:id` — Update candidate fields with email conflict check
+- `DELETE /api/candidates/:id` — Soft-delete candidate (sets `deleted_at`)
+
 ---
 
 ## 🚀 Getting Started
