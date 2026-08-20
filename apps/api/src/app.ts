@@ -5,6 +5,7 @@ import { corsConfig } from './config/cors.js';
 import { setupErrorHandler } from './plugins/error-handler.js';
 import { setupZodProvider } from './plugins/zod-provider.js';
 import prismaPlugin from './plugins/prisma.js';
+import { apiRoutes } from './routes/index.js';
 
 export function buildApp(opts: FastifyServerOptions = {}): FastifyInstance {
   const app = fastify({
@@ -33,6 +34,9 @@ export function buildApp(opts: FastifyServerOptions = {}): FastifyInstance {
   // Register plugins
   app.register(cors, corsConfig);
   app.register(prismaPlugin);
+
+  // Register API routes
+  app.register(apiRoutes, { prefix: '/api' });
 
   // Health check route
   app.get('/health', async () => {
