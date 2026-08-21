@@ -19,7 +19,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'Dashboard', href: '/', icon: LayoutDashboard },
   { label: 'Candidates', href: '/candidates', icon: Users },
   { label: 'Applications', href: '/applications', icon: Briefcase },
-  { label: 'Kanban Board', href: '/applications/kanban', icon: Layers, badge: 'Bonus' },
+  { label: 'Kanban Board', href: '/applications/kanban', icon: Layers },
 ];
 
 export function Sidebar() {
