@@ -77,7 +77,7 @@ export const updateApplicationRoute: FastifyPluginAsyncZod = async (fastify) => 
         },
       });
 
-      return reply.send({ data: updated });
+      return reply.send({ data: updated as any });
     }
   );
 };

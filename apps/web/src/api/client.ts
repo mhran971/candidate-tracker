@@ -1,8 +1,18 @@
 import axios from 'axios';
 
-const baseURL = import.meta.env.VITE_API_URL
-  ? `${import.meta.env.VITE_API_URL}/api`
-  : 'http://localhost:3001/api';
+const getBaseURL = () => {
+  if (import.meta.env.VITE_API_URL) {
+    const url = import.meta.env.VITE_API_URL;
+    return url.endsWith('/api') ? url : `${url}/api`;
+  }
+  // In production (e.g. on Netlify), use relative '/api' for same-origin serverless proxy
+  if (import.meta.env.PROD) {
+    return '/api';
+  }
+  return 'http://localhost:3001/api';
+};
+
+const baseURL = getBaseURL();
 
 export const apiClient = axios.create({
   baseURL,

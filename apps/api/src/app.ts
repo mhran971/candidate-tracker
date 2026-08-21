@@ -21,6 +21,13 @@ export function buildApp(opts: FastifyServerOptions = {}): FastifyInstance {
   // Setup global error handling
   setupErrorHandler(app);
 
+  // Support Netlify functions prefix redirect
+  app.addHook('onRequest', async (req) => {
+    if (req.url.startsWith('/.netlify/functions/api')) {
+      req.raw.url = req.url.replace('/.netlify/functions/api', '/api') || '/api';
+    }
+  });
+
   // Register plugins
   app.register(cors, corsConfig);
   app.register(prismaPlugin);
@@ -30,6 +37,9 @@ export function buildApp(opts: FastifyServerOptions = {}): FastifyInstance {
 
   // Health check route
   app.get('/health', async () => {
+    return { status: 'ok', timestamp: new Date().toISOString() };
+  });
+  app.get('/api/health', async () => {
     return { status: 'ok', timestamp: new Date().toISOString() };
   });
 

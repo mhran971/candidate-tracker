@@ -56,7 +56,7 @@ export const createApplicationRoute: FastifyPluginAsyncZod = async (fastify) => 
         },
       });
 
-      return reply.status(201).send({ data: application });
+      return reply.status(201).send({ data: application as any });
     }
   );
 };

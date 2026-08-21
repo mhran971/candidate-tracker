@@ -53,7 +53,7 @@ export const getApplicationRoute: FastifyPluginAsyncZod = async (fastify) => {
         });
       }
 
-      return reply.send({ data: application });
+      return reply.send({ data: application as any });
     }
   );
 };

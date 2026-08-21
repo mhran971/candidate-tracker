@@ -50,7 +50,7 @@ export const getCandidateRoute: FastifyPluginAsyncZod = async (fastify) => {
         });
       }
 
-      return reply.send({ data: candidate });
+      return reply.send({ data: candidate as any });
     }
   );
 };

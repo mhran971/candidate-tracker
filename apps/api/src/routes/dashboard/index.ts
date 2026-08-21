@@ -169,7 +169,7 @@ export const dashboardRoutes: FastifyPluginAsyncZod = async (fastify) => {
           applicationsByStatus,
           hiredThisMonth,
           rejectionRate,
-          latestApplications,
+          latestApplications: latestApplications as any,
           weeklyApplications,
         },
       });

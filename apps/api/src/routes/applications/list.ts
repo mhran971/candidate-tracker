@@ -125,7 +125,7 @@ export const listApplicationsRoute: FastifyPluginAsyncZod = async (fastify) => {
       const totalPages = Math.ceil(total / limit);
 
       return reply.send({
-        data: applications,
+        data: applications as any,
         meta: {
           total,
           page,
