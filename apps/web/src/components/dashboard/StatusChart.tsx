@@ -60,11 +60,19 @@ export function StatusChart({ data }: StatusChartProps) {
               <Tooltip
                 cursor={{ fill: 'currentColor', opacity: 0.05 }}
                 contentStyle={{
-                  backgroundColor: 'hsl(var(--card))',
-                  borderColor: 'hsl(var(--border))',
+                  backgroundColor: '#0f172a',
+                  borderColor: '#334155',
                   borderRadius: '0.75rem',
-                  boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
-                  color: 'hsl(var(--card-foreground))',
+                  boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.4)',
+                  color: '#ffffff',
+                }}
+                itemStyle={{
+                  color: '#ffffff',
+                  fontWeight: 500,
+                }}
+                labelStyle={{
+                  color: '#ffffff',
+                  fontWeight: 600,
                 }}
               />
               <Bar dataKey="count" radius={[6, 6, 0, 0]}>
@@ -108,10 +116,19 @@ export function StatusChart({ data }: StatusChartProps) {
                 </Pie>
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: 'hsl(var(--card))',
-                    borderColor: 'hsl(var(--border))',
+                    backgroundColor: '#0f172a',
+                    borderColor: '#334155',
                     borderRadius: '0.75rem',
-                    color: 'hsl(var(--card-foreground))',
+                    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.4)',
+                    color: '#ffffff',
+                  }}
+                  itemStyle={{
+                    color: '#ffffff',
+                    fontWeight: 500,
+                  }}
+                  labelStyle={{
+                    color: '#ffffff',
+                    fontWeight: 600,
                   }}
                 />
               </PieChart>
