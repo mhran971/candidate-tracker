@@ -43,6 +43,13 @@ candidate-tracker/
 - **Choice**: Used `fastify-type-provider-zod` with route handlers split per operation (`create.ts`, `list.ts`, `get.ts`, `update.ts`, `delete.ts`).
 - **Rationale**: Keeps each endpoint modular, isolated, readable, and 100% type-safe from request body/query to response envelope.
 
+### Decision 6: TanStack Query v5 Server State & Optimistic Status Updates
+- **Choice**: All client data fetching utilizes typed React Query hooks (`useCandidates`, `useApplications`, `useDashboard`). Status mutations implement optimistic UI updates with automatic cache rollback upon failure.
+- **Rationale**: Instant UI responsiveness, zero duplicate network requests, and centralized cache invalidation.
+
+### Decision 7: Accessible UI System with Radix Primitives & Dark Mode
+- **Choice**: UI built with Radix UI headless components and Tailwind CSS design tokens, offering full keyboard accessibility and seamless dark mode theme switching persisted in `localStorage`.
+
 ---
 
 ## 📡 API Endpoints Matrix
