@@ -54,6 +54,16 @@ candidate-tracker/
 - `PATCH /api/candidates/:id` — Update candidate fields with email conflict check
 - `DELETE /api/candidates/:id` — Soft-delete candidate (sets `deleted_at`)
 
+### Applications (`/api/applications`)
+- `POST /api/applications` — Create application linked to candidate (validates candidate exists, returns 201 / 404)
+- `GET /api/applications` — **Cross-Entity Search** via server-side SQL JOIN across `job_title`, `company`, `source`, `notes`, `candidate.name`, `candidate.email`, `candidate.location`, with status and date range filtering
+- `GET /api/applications/:id` — Single application with linked candidate details
+- `PATCH /api/applications/:id` — Update application with candidate reassignment check
+- `DELETE /api/applications/:id` — Hard delete application (returns 200 / 404)
+
+### Dashboard (`/api/dashboard`)
+- `GET /api/dashboard` — Aggregated metrics: `totalCandidates`, `totalApplications`, `applicationsByStatus`, `hiredThisMonth`, `rejectionRate`, `latestApplications`, `weeklyApplications` (8-week trend)
+
 ---
 
 ## 🚀 Getting Started
