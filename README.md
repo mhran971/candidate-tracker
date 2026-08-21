@@ -109,6 +109,38 @@ npm test
 
 ---
 
-## 🚢 Deployment (Vercel & Docker)
-- **Frontend**: Ready for deployment on **Vercel** / **Netlify** with standard Vite SPA routing.
-- **Backend API**: Containerized with Dockerfile or deployable to Railway / Render / Fly.io with PostgreSQL.
+## 🚢 Deployment & Production Setup
+
+### 1. Frontend Deployment (Vercel & Netlify)
+- **Vercel**: Pre-configured with [vercel.json](file:///apps/web/vercel.json) rewrite rules for single-page routing. Connect repository, set Root Directory to `apps/web`, and set Build Command to `npm run build`.
+- **Netlify**: Pre-configured with [netlify.toml](file:///apps/web/netlify.toml) redirects. Set Publish directory to `dist`.
+- **Environment Variable**: Configure `VITE_API_URL=https://your-api-domain.com`.
+
+### 2. Backend Container Deployment (Docker)
+- Multi-stage [Dockerfile](file:///apps/api/Dockerfile) included in `apps/api`.
+- Build & Run:
+```bash
+docker build -t candidate-tracker-api -f apps/api/Dockerfile .
+docker run -p 3001:3001 -e DATABASE_URL="postgresql://..." candidate-tracker-api
+```
+
+---
+
+## 🌟 Bonus Features Implemented
+- [x] **Cross-Entity Search**: Database SQL JOIN across Application and Candidate entities with parameterized queries.
+- [x] **Server-Side Aggregated Dashboard**: Dedicated aggregation queries (0 data calculation in JS frontend).
+- [x] **Interactive Kanban Pipeline Board**: Stage columns with instant optimistic update progression.
+- [x] **Dark / Light Theme Toggle**: Persistent mode switcher with Tailwind CSS variables and smooth transitions.
+- [x] **Optimistic UI Updates**: Application stage changes reflect immediately on the UI with auto rollback on failure.
+- [x] **Zero-Any TypeScript**: Inferred end-to-end types with strict compiler rules.
+- [x] **Containerized API Service**: Production-ready multi-stage Docker build.
+
+---
+
+## 💭 Engineering Reflections & Future Enhancements
+
+### What we would add with more time:
+1. **Cursor-Based Pagination**: Transition list endpoints from offset (`skip/take`) to cursor-based keyset pagination for multi-million record scale.
+2. **Realtime WebSockets / SSE**: Push instant dashboard and kanban updates when other recruiters create or modify applications.
+3. **Candidate Resume Uploads**: S3 / Cloudflare R2 bucket integration with pre-signed upload URLs and PDF preview rendering.
+4. **Email Automation**: Fastify background queue (BullMQ / Redis) for dispatching automated interview invitations and rejection emails.
