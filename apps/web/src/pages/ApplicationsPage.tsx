@@ -9,6 +9,7 @@ import { StatusBadge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
+import { DatePicker } from '@/components/ui/date-picker';
 import { TableSkeleton } from '@/components/ui/skeleton';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ErrorState } from '@/components/ui/error-state';
@@ -137,13 +138,13 @@ export function ApplicationsPage() {
           </div>
 
           {/* Date Range: From */}
-          <div className="w-full md:w-40">
-            <Input
-              type="date"
+          <div className="w-full md:w-44">
+            <DatePicker
               title="Applied Date From"
+              placeholder="From date..."
               value={dateFrom}
-              onChange={(e) => {
-                setDateFrom(e.target.value);
+              onChange={(val) => {
+                setDateFrom(val);
                 setPage(1);
               }}
               className="h-10 text-xs bg-background"
@@ -151,13 +152,13 @@ export function ApplicationsPage() {
           </div>
 
           {/* Date Range: To */}
-          <div className="w-full md:w-40">
-            <Input
-              type="date"
+          <div className="w-full md:w-44">
+            <DatePicker
               title="Applied Date To"
+              placeholder="To date..."
               value={dateTo}
-              onChange={(e) => {
-                setDateTo(e.target.value);
+              onChange={(val) => {
+                setDateTo(val);
                 setPage(1);
               }}
               className="h-10 text-xs bg-background"

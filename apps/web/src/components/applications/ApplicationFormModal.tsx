@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   createApplicationSchema,
@@ -21,6 +21,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { DatePicker } from '@/components/ui/date-picker';
 import { useCreateApplication, useUpdateApplication } from '@/hooks/useApplications';
 import { useCandidates } from '@/hooks/useCandidates';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -56,6 +57,7 @@ export function ApplicationFormModal({
     register,
     handleSubmit,
     reset,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<CreateApplicationInput>({
     resolver: zodResolver(createApplicationSchema),
@@ -198,10 +200,16 @@ export function ApplicationFormModal({
               <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">
                 Applied Date *
               </label>
-              <Input
-                type="date"
-                {...register('appliedAt')}
-                error={errors.appliedAt?.message}
+              <Controller
+                control={control}
+                name="appliedAt"
+                render={({ field }) => (
+                  <DatePicker
+                    value={field.value}
+                    onChange={(val) => field.onChange(val)}
+                    error={errors.appliedAt?.message}
+                  />
+                )}
               />
             </div>
           </div>
