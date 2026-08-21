@@ -12,12 +12,13 @@ build/
 .turbo/
 .netlify/
 
-# Environment variables
+# Environment variables & Secrets
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+.mcp.json
 
 # Logs
 npm-debug.log*

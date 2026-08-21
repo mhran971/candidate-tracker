@@ -4,11 +4,11 @@ import { z } from 'zod';
 loadDotenv();
 
 const envSchema = z.object({
-  DATABASE_URL: z.string().url().default('postgresql://dev:dev@localhost:5432/candidate_tracker'),
+  DATABASE_URL: z.string().default('file:./dev.db'),
   PORT: z.coerce.number().int().positive().default(3001),
   HOST: z.string().default('0.0.0.0'),
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
-  CORS_ORIGIN: z.string().default('http://localhost:5173'),
+  CORS_ORIGIN: z.string().default('*'),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);
