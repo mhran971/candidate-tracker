@@ -66,26 +66,26 @@ export const listApplicationsRoute: FastifyPluginAsyncZod = async (fastify) => {
         const searchTerm = search.trim();
         where.OR = [
           // Application table fields
-          { jobTitle: { contains: searchTerm, mode: 'insensitive' } },
-          { company: { contains: searchTerm, mode: 'insensitive' } },
-          { source: { contains: searchTerm, mode: 'insensitive' } },
-          { notes: { contains: searchTerm, mode: 'insensitive' } },
-          // Joined Candidate table fields (server-side JOIN in Prisma/PostgreSQL)
+          { jobTitle: { contains: searchTerm } },
+          { company: { contains: searchTerm } },
+          { source: { contains: searchTerm } },
+          { notes: { contains: searchTerm } },
+          // Joined Candidate table fields (server-side JOIN in Prisma)
           {
             candidate: {
-              name: { contains: searchTerm, mode: 'insensitive' },
+              name: { contains: searchTerm },
               deletedAt: null,
             },
           },
           {
             candidate: {
-              email: { contains: searchTerm, mode: 'insensitive' },
+              email: { contains: searchTerm },
               deletedAt: null,
             },
           },
           {
             candidate: {
-              location: { contains: searchTerm, mode: 'insensitive' },
+              location: { contains: searchTerm },
               deletedAt: null,
             },
           },

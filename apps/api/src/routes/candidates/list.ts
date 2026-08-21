@@ -46,16 +46,16 @@ export const listCandidatesRoute: FastifyPluginAsyncZod = async (fastify) => {
       if (search && search.trim() !== '') {
         const searchTerm = search.trim();
         where.OR = [
-          { name: { contains: searchTerm, mode: 'insensitive' } },
-          { email: { contains: searchTerm, mode: 'insensitive' } },
-          { location: { contains: searchTerm, mode: 'insensitive' } },
-          { phone: { contains: searchTerm, mode: 'insensitive' } },
+          { name: { contains: searchTerm } },
+          { email: { contains: searchTerm } },
+          { location: { contains: searchTerm } },
+          { phone: { contains: searchTerm } },
         ];
       }
 
       // Location specific filter
       if (location && location.trim() !== '') {
-        where.location = { contains: location.trim(), mode: 'insensitive' };
+        where.location = { contains: location.trim() };
       }
 
       // Dynamic sorting
