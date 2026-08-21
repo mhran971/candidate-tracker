@@ -21,8 +21,6 @@ import {
   User,
   ArrowRight,
   ArrowLeft,
-  Briefcase,
-  Layers,
   Sparkles,
 } from 'lucide-react';
 
