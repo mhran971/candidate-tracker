@@ -5,7 +5,7 @@ import {
   apiErrorResponseSchema,
 } from '../schemas/common.schema.js';
 
-export type PaginationQuery = z.infer<typeof paginationQuerySchema>;
+export type PaginationQuery = z.input<typeof paginationQuerySchema>;
 export type PaginationMeta = z.infer<typeof paginationMetaSchema>;
 export type ApiErrorResponse = z.infer<typeof apiErrorResponseSchema>;
 

@@ -12,7 +12,6 @@ import {
   Briefcase,
   CheckCircle2,
   XCircle,
-  TrendingUp,
   UserPlus,
   FilePlus2,
   Layers,

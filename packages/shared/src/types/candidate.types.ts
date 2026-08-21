@@ -11,7 +11,7 @@ export type Candidate = z.infer<typeof candidateSchema>;
 export type CreateCandidateInput = z.infer<typeof createCandidateSchema>;
 export type UpdateCandidateInput = z.infer<typeof updateCandidateSchema>;
 export type CandidateParams = z.infer<typeof candidateParamsSchema>;
-export type CandidateQuery = z.infer<typeof candidateQuerySchema>;
+export type CandidateQuery = z.input<typeof candidateQuerySchema>;
 
 export interface CandidateWithApplicationCount extends Candidate {
   _count?: {

@@ -1,4 +1,13 @@
-import { PrismaClient, ApplicationStatus } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
+
+const ApplicationStatus = {
+  applied: 'applied',
+  screening: 'screening',
+  interview: 'interview',
+  offer: 'offer',
+  hired: 'hired',
+  rejected: 'rejected',
+} as const;
 
 const prisma = new PrismaClient();
 

@@ -20,7 +20,6 @@ import {
   Trash2,
   ChevronLeft,
   ChevronRight,
-  Filter,
   User,
   Building,
   Briefcase,
