@@ -82,8 +82,9 @@ export const listApplicationsRoute: FastifyPluginAsyncZod = async (fastify) => {
       }
 
       // Dynamic sorting
+      const sortField = sortBy || 'createdAt';
       const orderBy: Prisma.ApplicationOrderByWithRelationInput = {
-        [sortBy as string]: sortOrder,
+        [sortField]: sortOrder || 'desc',
       };
 
       // Execute count and data fetch in parallel

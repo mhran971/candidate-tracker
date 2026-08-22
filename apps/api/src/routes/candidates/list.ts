@@ -37,8 +37,9 @@ export const listCandidatesRoute: FastifyPluginAsyncZod = async (fastify) => {
       }
 
       // Dynamic sorting
+      const sortField = sortBy || 'createdAt';
       const orderBy: Prisma.CandidateOrderByWithRelationInput = {
-        [sortBy as string]: sortOrder,
+        [sortField]: sortOrder || 'desc',
       };
 
       // Parallel execution for total count and paginated items
