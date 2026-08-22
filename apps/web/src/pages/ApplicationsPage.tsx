@@ -198,10 +198,10 @@ export function ApplicationsPage() {
           onAction={hasActiveFilters ? clearFilters : () => setIsCreateOpen(true)}
         />
       ) : (
-        <div className="bg-card rounded-xl border border-border/80 shadow-xs overflow-hidden">
+        <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm text-left">
-              <thead className="bg-muted/40 text-muted-foreground text-xs uppercase font-medium border-b border-border/80">
+              <thead className="bg-muted/70 text-slate-700 dark:text-slate-300 text-xs uppercase font-bold border-b border-border">
                 <tr>
                   <th className="px-6 py-3.5">Job Role & Company</th>
                   <th className="px-6 py-3.5">Candidate</th>

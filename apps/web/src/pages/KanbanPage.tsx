@@ -25,34 +25,34 @@ import {
 
 const COLUMN_COLORS: Record<ApplicationStatus, { header: string; count: string; border: string }> = {
   applied: {
-    header: 'bg-slate-100 dark:bg-slate-900/60 text-slate-700 dark:text-slate-300',
-    count: 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300',
-    border: 'border-slate-200 dark:border-slate-800',
+    header: 'bg-slate-100 dark:bg-slate-900/60 text-slate-900 dark:text-slate-200 font-bold',
+    count: 'bg-slate-200/80 dark:bg-slate-800 text-slate-900 dark:text-slate-200',
+    border: 'border-slate-300 dark:border-slate-800',
   },
   screening: {
-    header: 'bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300',
-    count: 'bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-300',
-    border: 'border-amber-200/80 dark:border-amber-900/50',
+    header: 'bg-amber-100/90 dark:bg-amber-950/60 text-amber-950 dark:text-amber-200 font-bold',
+    count: 'bg-amber-200/90 dark:bg-amber-900/60 text-amber-950 dark:text-amber-200',
+    border: 'border-amber-300 dark:border-amber-900/50',
   },
   interview: {
-    header: 'bg-blue-50 dark:bg-blue-950/40 text-blue-800 dark:text-blue-300',
-    count: 'bg-blue-100 dark:bg-blue-900/60 text-blue-800 dark:text-blue-300',
-    border: 'border-blue-200/80 dark:border-blue-900/50',
+    header: 'bg-blue-100/90 dark:bg-blue-950/60 text-blue-950 dark:text-blue-200 font-bold',
+    count: 'bg-blue-200/90 dark:bg-blue-900/60 text-blue-950 dark:text-blue-200',
+    border: 'border-blue-300 dark:border-blue-900/50',
   },
   offer: {
-    header: 'bg-purple-50 dark:bg-purple-950/40 text-purple-800 dark:text-purple-300',
-    count: 'bg-purple-100 dark:bg-purple-900/60 text-purple-800 dark:text-purple-300',
-    border: 'border-purple-200/80 dark:border-purple-900/50',
+    header: 'bg-purple-100/90 dark:bg-purple-950/60 text-purple-950 dark:text-purple-200 font-bold',
+    count: 'bg-purple-200/90 dark:bg-purple-900/60 text-purple-950 dark:text-purple-200',
+    border: 'border-purple-300 dark:border-purple-900/50',
   },
   hired: {
-    header: 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300',
-    count: 'bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300',
-    border: 'border-emerald-200/80 dark:border-emerald-900/50',
+    header: 'bg-emerald-100/90 dark:bg-emerald-950/60 text-emerald-950 dark:text-emerald-200 font-bold',
+    count: 'bg-emerald-200/90 dark:bg-emerald-900/60 text-emerald-950 dark:text-emerald-200',
+    border: 'border-emerald-300 dark:border-emerald-900/50',
   },
   rejected: {
-    header: 'bg-rose-50 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300',
-    count: 'bg-rose-100 dark:bg-rose-900/60 text-rose-800 dark:text-rose-300',
-    border: 'border-rose-200/80 dark:border-rose-900/50',
+    header: 'bg-rose-100/90 dark:bg-rose-950/60 text-rose-950 dark:text-rose-200 font-bold',
+    count: 'bg-rose-200/90 dark:bg-rose-900/60 text-rose-950 dark:text-rose-200',
+    border: 'border-rose-300 dark:border-rose-900/50',
   },
 };
 

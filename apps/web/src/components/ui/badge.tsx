@@ -8,25 +8,25 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
-        default: 'border-transparent bg-primary text-primary-foreground shadow hover:bg-primary/80',
+        default: 'border-transparent bg-primary text-primary-foreground shadow hover:bg-primary/90',
         secondary:
-          'border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80',
+          'border-border bg-secondary text-secondary-foreground hover:bg-secondary/80',
         destructive:
-          'border-transparent bg-destructive text-destructive-foreground shadow hover:bg-destructive/80',
-        outline: 'text-foreground',
-        // Application Status Badges
+          'border-transparent bg-destructive text-destructive-foreground shadow hover:bg-destructive/90',
+        outline: 'border-border text-foreground',
+        // High Contrast Application Status Badges
         applied:
-          'border-slate-300 dark:border-slate-700 bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300',
+          'border-slate-300 dark:border-slate-700 bg-slate-100 text-slate-800 font-semibold dark:bg-slate-800 dark:text-slate-200',
         screening:
-          'border-amber-200 dark:border-amber-800 bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400',
+          'border-amber-300 dark:border-amber-800 bg-amber-100/90 text-amber-900 font-semibold dark:bg-amber-950/60 dark:text-amber-300',
         interview:
-          'border-blue-200 dark:border-blue-800 bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400',
+          'border-blue-300 dark:border-blue-800 bg-blue-100/90 text-blue-950 font-semibold dark:bg-blue-950/60 dark:text-blue-300',
         offer:
-          'border-purple-200 dark:border-purple-800 bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-400',
+          'border-purple-300 dark:border-purple-800 bg-purple-100/90 text-purple-950 font-semibold dark:bg-purple-950/60 dark:text-purple-300',
         hired:
-          'border-emerald-200 dark:border-emerald-800 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400',
+          'border-emerald-300 dark:border-emerald-800 bg-emerald-100/90 text-emerald-950 font-semibold dark:bg-emerald-950/60 dark:text-emerald-300',
         rejected:
-          'border-rose-200 dark:border-rose-800 bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400',
+          'border-rose-300 dark:border-rose-800 bg-rose-100/90 text-rose-950 font-semibold dark:bg-rose-950/60 dark:text-rose-300',
       },
     },
     defaultVariants: {
@@ -50,8 +50,8 @@ export interface StatusBadgeProps {
 
 export function StatusBadge({ status, className }: StatusBadgeProps) {
   return (
-    <Badge variant={status} className={cn('capitalize font-medium shadow-xs', className)}>
-      <span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-current opacity-75 inline-block" />
+    <Badge variant={status} className={cn('capitalize font-medium shadow-2xs', className)}>
+      <span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-current opacity-85 inline-block" />
       {APPLICATION_STATUS_LABELS[status] || status}
     </Badge>
   );

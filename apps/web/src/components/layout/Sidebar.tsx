@@ -54,8 +54,8 @@ export function Sidebar() {
                 cn(
                   'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 group',
                   isActive
-                    ? 'bg-primary text-primary-foreground shadow-xs shadow-primary/20 font-semibold'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-accent/60'
+                    ? 'bg-primary text-primary-foreground shadow-sm shadow-primary/25 font-semibold'
+                    : 'text-slate-700 dark:text-slate-300 hover:text-foreground hover:bg-accent/80 font-medium'
                 )
               }
             >
