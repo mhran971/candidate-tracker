@@ -1,24 +1,7 @@
 import axios from 'axios';
 
-const getBaseURL = () => {
-  // In production (Netlify), use relative '/api' unless an explicit non-localhost production API is specified
-  if (import.meta.env.PROD) {
-    if (import.meta.env.VITE_API_URL && !import.meta.env.VITE_API_URL.includes('localhost')) {
-      const url = import.meta.env.VITE_API_URL;
-      return url.endsWith('/api') ? url : `${url}/api`;
-    }
-    return '/api';
-  }
-
-  if (import.meta.env.VITE_API_URL) {
-    const url = import.meta.env.VITE_API_URL;
-    return url.endsWith('/api') ? url : `${url}/api`;
-  }
-
-  return 'http://localhost:3001/api';
-};
-
-const baseURL = getBaseURL();
+// In production on Netlify, always use same-domain '/api'. In local development, use localhost:3001
+const baseURL = import.meta.env.DEV ? 'http://localhost:3001/api' : '/api';
 
 export const apiClient = axios.create({
   baseURL,
