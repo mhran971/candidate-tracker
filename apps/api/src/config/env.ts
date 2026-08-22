@@ -4,7 +4,10 @@ import { z } from 'zod';
 loadDotenv();
 
 const envSchema = z.object({
-  DATABASE_URL: z.string().default('file:./dev.db'),
+  DATABASE_URL: z
+    .string()
+    .transform((val) => val.trim().replace(/^["']|["']$/g, ''))
+    .default('postgresql://dev:dev@localhost:5432/candidate_tracker'),
   PORT: z.coerce.number().int().positive().default(3001),
   HOST: z.string().default('0.0.0.0'),
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),

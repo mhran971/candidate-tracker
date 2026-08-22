@@ -13,7 +13,12 @@ let globalPrisma: PrismaClient | undefined;
 
 function getPrismaClient(): PrismaClient {
   if (!globalPrisma) {
+    let dbUrl = process.env.DATABASE_URL?.trim().replace(/^["']|["']$/g, '');
+    if (dbUrl) {
+      process.env.DATABASE_URL = dbUrl;
+    }
     globalPrisma = new PrismaClient({
+      datasources: dbUrl ? { db: { url: dbUrl } } : undefined,
       log: process.env.NODE_ENV === 'development' ? ['warn', 'error'] : ['error'],
     });
   }
