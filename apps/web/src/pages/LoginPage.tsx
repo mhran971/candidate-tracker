@@ -10,47 +10,14 @@ import toast from 'react-hot-toast';
 
 const AUTHORIZED_ADMIN_EMAIL = 'mhranabwdqt971@gmail.com';
 
-// Official Brand SVG Icons
-function GoogleIcon({ className = 'h-4 w-4' }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24">
-      <path
-        fill="#4285F4"
-        d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"
-      />
-      <path
-        fill="#34A853"
-        d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"
-      />
-      <path
-        fill="#FBBC05"
-        d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.16 0 9.97 0 12s.45 3.84 1.25 5.42l4.03-3.15z"
-      />
-      <path
-        fill="#EA4335"
-        d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
-      />
-    </svg>
-  );
-}
-
-function LinkedInIcon({ className = 'h-4 w-4' }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="#0A66C2">
-      <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z" />
-    </svg>
-  );
-}
-
 export function LoginPage() {
-  const { user, signIn, signInWithOAuth, isLoading } = useAuth();
+  const { user, signIn, isLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
   const [email, setEmail] = useState(AUTHORIZED_ADMIN_EMAIL);
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSocialSubmitting, setIsSocialSubmitting] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // If already logged in, redirect to destination or home
@@ -58,23 +25,6 @@ export function LoginPage() {
   if (user && !isLoading) {
     return <Navigate to={from} replace />;
   }
-
-  const handleOAuthSignIn = async (provider: 'google' | 'linkedin_oidc') => {
-    setErrorMessage(null);
-    setIsSocialSubmitting(provider);
-    try {
-      const { error } = await signInWithOAuth(provider);
-      if (error) {
-        setErrorMessage(error.message);
-        toast.error(error.message);
-      }
-    } catch (err: any) {
-      setErrorMessage(err.message || 'OAuth sign in failed');
-      toast.error(err.message || 'OAuth sign in failed');
-    } finally {
-      setIsSocialSubmitting(null);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -146,62 +96,19 @@ export function LoginPage() {
               Administrator Sign In
             </CardTitle>
             <CardDescription className="text-xs">
-              Sign in with your Google / LinkedIn account or enter your master credentials.
+              Enter your master credentials to access your recruitment pipeline and candidate data.
             </CardDescription>
           </CardHeader>
 
-          <CardContent className="space-y-4">
-            {errorMessage && (
-              <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-xs font-semibold flex items-start gap-2 animate-in fade-in">
-                <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
-                <span>{errorMessage}</span>
-              </div>
-            )}
-
-            {/* Social Authentication Buttons */}
-            <div className="grid grid-cols-2 gap-3">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => handleOAuthSignIn('google')}
-                disabled={isSubmitting || isSocialSubmitting !== null}
-                className="h-11 font-semibold text-xs border-border bg-card hover:bg-accent gap-2 shadow-2xs transition-transform active:scale-95"
-              >
-                {isSocialSubmitting === 'google' ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <GoogleIcon className="h-4 w-4 shrink-0" />
-                )}
-                <span>Google / Gmail</span>
-              </Button>
-
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => handleOAuthSignIn('linkedin_oidc')}
-                disabled={isSubmitting || isSocialSubmitting !== null}
-                className="h-11 font-semibold text-xs border-border bg-card hover:bg-accent gap-2 shadow-2xs transition-transform active:scale-95"
-              >
-                {isSocialSubmitting === 'linkedin_oidc' ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <LinkedInIcon className="h-4 w-4 shrink-0" />
-                )}
-                <span>LinkedIn</span>
-              </Button>
-            </div>
-
-            {/* Divider */}
-            <div className="relative flex py-1 items-center">
-              <div className="flex-grow border-t border-border"></div>
-              <span className="flex-shrink mx-3 text-[11px] font-bold text-slate-600 dark:text-muted-foreground uppercase tracking-wider">
-                Or continue with password
-              </span>
-              <div className="flex-grow border-t border-border"></div>
-            </div>
-
-            {/* Standard Sign In Form (Preserved) */}
+          <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
+              {errorMessage && (
+                <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-xs font-semibold flex items-start gap-2 animate-in fade-in">
+                  <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
+                  <span>{errorMessage}</span>
+                </div>
+              )}
+
               {/* Email Input */}
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
@@ -215,7 +122,7 @@ export function LoginPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    disabled={isSubmitting || isSocialSubmitting !== null}
+                    disabled={isSubmitting}
                     className="pl-9 h-10 text-sm font-medium bg-background"
                   />
                 </div>
@@ -234,7 +141,7 @@ export function LoginPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    disabled={isSubmitting || isSocialSubmitting !== null}
+                    disabled={isSubmitting}
                     className="pl-9 h-10 text-sm font-medium bg-background"
                     autoFocus
                   />
@@ -244,7 +151,7 @@ export function LoginPage() {
               {/* Submit Button */}
               <Button
                 type="submit"
-                disabled={isSubmitting || isSocialSubmitting !== null}
+                disabled={isSubmitting}
                 className="w-full h-11 text-sm font-bold shadow-md shadow-primary/25 gap-2 mt-2"
               >
                 {isSubmitting ? (
@@ -255,7 +162,7 @@ export function LoginPage() {
                 ) : (
                   <>
                     <LogIn className="h-4 w-4" />
-                    <span>Sign In with Password</span>
+                    <span>Sign In to Dashboard</span>
                   </>
                 )}
               </Button>
@@ -265,7 +172,7 @@ export function LoginPage() {
 
         {/* Security Footer Note */}
         <p className="text-center text-[11px] text-muted-foreground font-medium">
-          Protected with end-to-end Supabase Auth (OAuth 2.0 & encrypted JWT sessions).
+          Protected with end-to-end Supabase Auth and encrypted database pooling.
         </p>
       </div>
     </div>
