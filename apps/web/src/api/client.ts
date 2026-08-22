@@ -1,7 +1,6 @@
 import axios from 'axios';
 
-// In production on Netlify, always use same-domain '/api'. In local development, use localhost:3001
-const baseURL = import.meta.env.DEV ? 'https://candidate3acker.netlify.app/api' : '/api';
+const baseURL = import.meta.env.DEV ? 'http://localhost:3001/api' : '/api';
 
 export const apiClient = axios.create({
   baseURL,

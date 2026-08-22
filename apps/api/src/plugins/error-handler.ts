@@ -63,14 +63,11 @@ export function setupErrorHandler(fastify: FastifyInstance): void {
 
       // Handle standard HTTP status errors
       const statusCode = (error as FastifyError).statusCode || 500;
-      const message =
-        statusCode === 500 && process.env.NODE_ENV === 'production'
-          ? 'Internal Server Error'
-          : error.message;
+      const message = error.message || 'Internal Server Error';
 
       return reply.status(statusCode).send({
         statusCode,
-        error: statusCode === 500 ? 'Internal Server Error' : error.name || 'Error',
+        error: error.name || 'Error',
         message,
       });
     }
