@@ -1,6 +1,8 @@
 # Candidate Tracker 🎯
 
-A modern full-stack Recruitment & Candidate Tracking system built with TypeScript, React 18, Fastify 4, Prisma ORM, and PostgreSQL.
+A high-performance, full-stack Recruitment & Candidate Tracking platform built with TypeScript, React 18, Fastify 4, Prisma ORM, and PostgreSQL.
+
+🌐 **Live Production Deployment**: [https://reliable-hummingbird-cfb316.netlify.app](https://reliable-hummingbird-cfb316.netlify.app)
 
 ---
 
@@ -9,138 +11,163 @@ A modern full-stack Recruitment & Candidate Tracking system built with TypeScrip
 ```
 candidate-tracker/
 ├── apps/
-│   ├── api/          # Fastify 4 backend with Type-Provider-Zod & Prisma
-│   └── web/          # React 18 + Vite frontend with TanStack Query & shadcn/ui
+│   ├── api/              # Fastify 4 backend with Type-Provider-Zod & Prisma
+│   └── web/              # React 18 + Vite frontend with TanStack Query & Tailwind CSS
 ├── packages/
-│   └── shared/       # Single source of truth: Zod schemas & inferred TypeScript types
-├── docker-compose.yml # PostgreSQL 15 container
+│   └── shared/           # Single source of truth: Zod schemas & TypeScript types
+├── docker-compose.yml     # Local PostgreSQL 15 container
+├── .env.example          # Template for environment variables (Zero secrets in repo)
+├── netlify.toml          # Production Netlify configuration
+├── vercel.json           # Production Vercel configuration
 └── README.md
 ```
 
 ---
 
-## 🧠 Key Architectural Decisions & Engineering Log
+## 🚀 Quick Start Guide (Local Development)
 
-> *This section is maintained continuously as decisions are made to document rationale, trade-offs, and technical choices.*
+### 1. Prerequisites
+- **Node.js**: v18+ or v20+
+- **Docker & Docker Compose**: (for local PostgreSQL instance)
 
-### Decision 1: Single Source of Truth via `@candidate-tracker/shared`
-- **Choice**: Centralized Zod schemas in `packages/shared` consumed by both Fastify backend routes and React frontend forms/hooks.
-- **Rationale**: Guarantees zero schema drift between API validation and client form handling. Types are inferred using `z.infer` with strict zero-`any` rule.
-- **Trade-off**: Requires monorepo workspaces setup, but eliminates duplicated DTO interfaces completely.
+### 2. Step-by-Step Local Setup
+
+```bash
+# 1. Clone repository and install dependencies
+git clone https://github.com/mhran971/candidate-tracker.git
+cd candidate-tracker
+npm install
+
+# 2. Configure Environment Variables
+cp .env.example .env
+
+# 3. Start Local PostgreSQL Database via Docker
+docker compose up -d
+
+# 4. Generate Prisma Client, Apply Migrations & Seed Sample Data
+npm run prisma:generate
+npm run db:migrate
+npm run db:seed
+
+# 5. Start Both Applications (Backend & Frontend) in Development Mode
+npm run dev
+
+# Or start individually:
+# npm run dev:api    # Fastify API runs on http://localhost:3001
+# npm run dev:web    # React App runs on http://localhost:5173
+```
+
+### 3. Verify Local Services
+- **Web Application**: Open [http://localhost:5173](http://localhost:5173) in your browser.
+- **Fastify API Server**: Accessible on [http://localhost:3001](http://localhost:3001).
+- **API Health Check**: [http://localhost:3001/api/health](http://localhost:3001/api/health) -> `{"status":"ok"}`.
+- **Prisma Studio**: `npm run db:studio` -> GUI on [http://localhost:5555](http://localhost:5555).
+
+---
+
+## ⚙️ Environment Variables (`.env.example`)
+
+Copy `.env.example` to `.env` before starting the application:
+
+```env
+# ==========================================
+# 1. DATABASE CONFIGURATION (Prisma ORM)
+# ==========================================
+# For Local Development (PostgreSQL in Docker):
+DATABASE_URL="postgresql://dev:dev@localhost:5432/candidate_tracker"
+
+# ==========================================
+# 2. BACKEND / SERVER CONFIGURATION
+# ==========================================
+NODE_ENV=development
+PORT=3001
+HOST=0.0.0.0
+CORS_ORIGIN=*
+
+# ==========================================
+# 3. FRONTEND CONFIGURATION (Vite)
+# ==========================================
+# In local development, Vite automatically proxies /api to http://localhost:3001
+VITE_API_URL=http://localhost:3001
+```
+
+> 🔒 **Security Notice**: No secrets, private API keys, or `.env` files are tracked in this repository. All sensitive parameters are configured via environment variables.
+
+---
+
+## 🧠 Architectural Decisions & Engineering Rationale
+
+### Decision 1: Monorepo with Shared Zod Validation (`@candidate-tracker/shared`)
+- **Choice**: All DTO schemas, query filters, and domain types are defined once in `packages/shared` using Zod and TypeScript `z.infer`.
+- **Rationale**: Completely eliminates schema drift between the Fastify backend and the React frontend. Any change to a model validation rule is automatically enforced across both client and server at compile time.
 
 ### Decision 2: Cross-Entity Search via Server-Side SQL JOIN
-- **Choice**: Cross-entity search in `/api/applications` searches across `Application` fields (`job_title`, `company`, `source`, `notes`) and linked `Candidate` fields (`name`, `email`, `location`) using database JOIN with parameterized queries.
-- **Rationale**: Efficient database query execution, accurate pagination, and avoids heavy JavaScript array filtering on the server.
+- **Choice**: Cross-entity search in `/api/applications` queries across `Application` fields (`jobTitle`, `company`, `source`, `notes`) and linked `Candidate` fields (`name`, `email`, `location`) using PostgreSQL indexed `ILIKE`/`contains` and database relational joins.
+- **Rationale**: Offloads search filtering to the database engine with accurate pagination metadata, avoiding inefficient in-memory JavaScript filtering.
 
 ### Decision 3: Server-Side Aggregations for Dashboard Metrics
-- **Choice**: Dashboard metrics (`totalCandidates`, `totalApplications`, `applicationsByStatus`, `hiredThisMonth`, `rejectionRate`, `weeklyApplications`) computed strictly on PostgreSQL via `COUNT`, `GROUP BY`, and indexed date filters.
-- **Rationale**: Minimal payload transfer and high performance regardless of record scale.
+- **Choice**: Dashboard KPIs (`totalCandidates`, `totalApplications`, `applicationsByStatus`, `rejectionRate`, `weeklyTrend`) are computed directly on PostgreSQL using parallel aggregations (`COUNT`, `GROUP BY`, date range filters).
+- **Rationale**: Minimal network payload and predictable, fast response times regardless of table growth.
 
-### Decision 4: Soft Delete for Candidates with Query Filtering
-- **Choice**: Candidates have `deleted_at` timestamp. Queries filter `deleted_at IS NULL` to exclude soft-deleted candidates while preserving historical application relations.
+### Decision 4: Soft Delete for Candidates with Relation Integrity
+- **Choice**: Candidate entities use a `deletedAt` timestamp for soft deletion.
+- **Rationale**: Ensures historical application records remain intact and audit logs are preserved, while active queries exclude soft-deleted profiles.
 
-### Decision 5: Schema-First Route Definition with Type Provider
-- **Choice**: Used `fastify-type-provider-zod` with route handlers split per operation (`create.ts`, `list.ts`, `get.ts`, `update.ts`, `delete.ts`).
-- **Rationale**: Keeps each endpoint modular, isolated, readable, and 100% type-safe from request body/query to response envelope.
+### Decision 5: TanStack Query v5 Server State & Optimistic Kanban Updates
+- **Choice**: All client-side data fetching and caching uses TanStack Query v5. Kanban board stage transitions update the UI optimistically and automatically revert if the server mutation fails.
+- **Rationale**: Provides an instantaneous, snappy user experience with automated caching and zero duplicate network requests.
 
-### Decision 6: TanStack Query v5 Server State & Optimistic Status Updates
-- **Choice**: All client data fetching utilizes typed React Query hooks (`useCandidates`, `useApplications`, `useDashboard`). Status mutations implement optimistic UI updates with automatic cache rollback upon failure.
-- **Rationale**: Instant UI responsiveness, zero duplicate network requests, and centralized cache invalidation.
-
-### Decision 7: Accessible UI System with Radix Primitives & Dark Mode
-- **Choice**: UI built with Radix UI headless components and Tailwind CSS design tokens, offering full keyboard accessibility and seamless dark mode theme switching persisted in `localStorage`.
+### Decision 6: WCAG AAA High-Contrast Light & Dark Theme System
+- **Choice**: Custom CSS design tokens with tailored HSL color palettes and high-contrast status badges (`applied`, `screening`, `interview`, `offer`, `hired`, `rejected`) that adapt seamlessly across light and dark modes.
+- **Rationale**: Ensures maximum visual comfort, crisp readability, and full accessibility compliance.
 
 ---
 
 ## 📡 API Endpoints Matrix
 
-### Candidates (`/api/candidates`)
-- `POST /api/candidates` — Create candidate (validates email uniqueness, returns 201 / 409)
-- `GET /api/candidates` — Paginated list with multi-field search (`name`, `email`, `location`, `phone`)
-- `GET /api/candidates/:id` — Candidate profile with all associated applications
-- `PATCH /api/candidates/:id` — Update candidate fields with email conflict check
-- `DELETE /api/candidates/:id` — Soft-delete candidate (sets `deleted_at`)
-
-### Applications (`/api/applications`)
-- `POST /api/applications` — Create application linked to candidate (validates candidate exists, returns 201 / 404)
-- `GET /api/applications` — **Cross-Entity Search** via server-side SQL JOIN across `job_title`, `company`, `source`, `notes`, `candidate.name`, `candidate.email`, `candidate.location`, with status and date range filtering
-- `GET /api/applications/:id` — Single application with linked candidate details
-- `PATCH /api/applications/:id` — Update application with candidate reassignment check
-- `DELETE /api/applications/:id` — Hard delete application (returns 200 / 404)
-
-### Dashboard (`/api/dashboard`)
-- `GET /api/dashboard` — Aggregated metrics: `totalCandidates`, `totalApplications`, `applicationsByStatus`, `hiredThisMonth`, `rejectionRate`, `latestApplications`, `weeklyApplications` (8-week trend)
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/api/health` | Health check & uptime status |
+| `GET` | `/api/dashboard` | Aggregated dashboard metrics & 8-week application trends |
+| `GET` | `/api/candidates` | Paginated candidate directory with multi-field search |
+| `POST` | `/api/candidates` | Create new candidate profile (enforces unique email) |
+| `GET` | `/api/candidates/:id` | Candidate profile details with all linked applications |
+| `PATCH` | `/api/candidates/:id` | Update candidate profile details |
+| `DELETE` | `/api/candidates/:id` | Soft delete candidate profile |
+| `GET` | `/api/applications` | **Cross-Entity Search** across job & candidate fields with status/date filters |
+| `POST` | `/api/applications` | Create application linked to a candidate |
+| `GET` | `/api/applications/:id` | Detailed application record with candidate relations |
+| `PATCH` | `/api/applications/:id` | Update application stage, salary, notes, or candidate link |
+| `DELETE` | `/api/applications/:id` | Delete application record |
 
 ---
 
-## 🚀 Getting Started
+## 🧪 Verification & Type Safety
 
-### 1. Prerequisites
-- Node.js 18+ or 20+
-- Docker & Docker Compose (for PostgreSQL)
-
-### 2. Quick Setup Commands
+### TypeScript Compilation (Zero Errors)
 ```bash
-# 1. Install all dependencies across workspaces
-npm install
+# Run TypeScript compilation checks across all workspaces:
+npx tsc --noEmit
+npm run build
+```
 
-# 2. Start PostgreSQL container
-docker compose up -d
-
-# 3. Apply database migrations and seed initial dataset
-npm run db:migrate
-npm run db:seed
-
-# 4. Start Fastify API (port 3001)
-npm run dev:api
-
-# 5. Start Vite Frontend (port 5173)
-npm run dev:web
-
-# 6. Run all test suites
+### Automated API & Unit Tests
+```bash
+# Run test suite across all packages:
 npm test
 ```
 
 ---
 
-## 🧪 Testing Strategy
-- **API Route Tests**: Vitest with Fastify `inject()` for testing HTTP status codes (201, 200, 400, 404, 409) without spawning network sockets.
-- **Schema Unit Tests**: Validating shared Zod schemas against edge cases, valid inputs, and malformed payloads.
+## 💭 What We Would Implement With Extra Time
 
----
-
-## 🚢 Deployment & Production Setup
-
-### 1. Frontend Deployment (Vercel & Netlify)
-- **Vercel**: Pre-configured with [vercel.json](file:///apps/web/vercel.json) rewrite rules for single-page routing. Connect repository, set Root Directory to `apps/web`, and set Build Command to `npm run build`.
-- **Netlify**: Pre-configured with [netlify.toml](file:///apps/web/netlify.toml) redirects. Set Publish directory to `dist`.
-- **Environment Variable**: Configure `VITE_API_URL=https://your-api-domain.com`.
-
-### 2. Backend Container Deployment (Docker)
-- Multi-stage [Dockerfile](file:///apps/api/Dockerfile) included in `apps/api`.
-- Build & Run:
-```bash
-docker build -t candidate-tracker-api -f apps/api/Dockerfile .
-docker run -p 3001:3001 -e DATABASE_URL="postgresql://..." candidate-tracker-api
-```
-
----
-
-## 🌟 Bonus Features Implemented
-- [x] **Cross-Entity Search**: Database SQL JOIN across Application and Candidate entities with parameterized queries.
-- [x] **Server-Side Aggregated Dashboard**: Dedicated aggregation queries (0 data calculation in JS frontend).
-- [x] **Interactive Kanban Pipeline Board**: Stage columns with instant optimistic update progression.
-- [x] **Dark / Light Theme Toggle**: Persistent mode switcher with Tailwind CSS variables and smooth transitions.
-- [x] **Optimistic UI Updates**: Application stage changes reflect immediately on the UI with auto rollback on failure.
-- [x] **Zero-Any TypeScript**: Inferred end-to-end types with strict compiler rules.
-- [x] **Containerized API Service**: Production-ready multi-stage Docker build.
-
----
-
-## 💭 Engineering Reflections & Future Enhancements
-
-### What we would add with more time:
-1. **Cursor-Based Pagination**: Transition list endpoints from offset (`skip/take`) to cursor-based keyset pagination for multi-million record scale.
-2. **Realtime WebSockets / SSE**: Push instant dashboard and kanban updates when other recruiters create or modify applications.
-3. **Candidate Resume Uploads**: S3 / Cloudflare R2 bucket integration with pre-signed upload URLs and PDF preview rendering.
-4. **Email Automation**: Fastify background queue (BullMQ / Redis) for dispatching automated interview invitations and rejection emails.
+1. **AI-Powered Resume Parsing & Matching**:
+   - Automated PDF/DOCX parsing using OpenAI or Gemini embeddings to extract candidate skills, experience, and match score against job descriptions.
+2. **Real-time Collaboration via WebSockets / Supabase Realtime**:
+   - Live cursor presence and instant Kanban updates across multiple hiring team members without manual page refreshes.
+3. **Automated Email & Calendar Pipeline**:
+   - Automated candidate notification emails upon status changes (e.g., Interview invitation, Offer letter) and Google/Outlook Calendar scheduling integration.
+4. **Role-Based Access Control (RBAC)**:
+   - Multi-role permissions matrix (Admin, Senior Recruiter, Hiring Manager, Reviewer) with granular action permissions.
+5. **Cursor-Based Keyset Pagination**:
+   - Transition high-volume endpoints from offset (`skip/take`) to cursor keyset pagination for scaling to millions of records with constant `O(1)` query performance.
