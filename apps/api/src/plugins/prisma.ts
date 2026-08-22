@@ -8,22 +8,21 @@ declare module 'fastify' {
   }
 }
 
+// Global cached Prisma instance to reuse connection pools across serverless function invocations
+let globalPrisma: PrismaClient | undefined;
+
+function getPrismaClient(): PrismaClient {
+  if (!globalPrisma) {
+    globalPrisma = new PrismaClient({
+      log: process.env.NODE_ENV === 'development' ? ['warn', 'error'] : ['error'],
+    });
+  }
+  return globalPrisma;
+}
+
 const prismaPlugin: FastifyPluginAsync = fp(async (fastify) => {
-  const prisma = new PrismaClient({
-    log:
-      process.env.NODE_ENV === 'development'
-        ? ['warn', 'error']
-        : ['error'],
-  });
-
-  await prisma.$connect();
-
+  const prisma = getPrismaClient();
   fastify.decorate('prisma', prisma);
-
-  fastify.addHook('onClose', async (server) => {
-    server.log.info('Disconnecting Prisma client...');
-    await server.prisma.$disconnect();
-  });
 });
 
 export default prismaPlugin;
