@@ -158,16 +158,3 @@ npm test
 ```
 
 ---
-
-## 💭 What We Would Implement With Extra Time
-
-1. **AI-Powered Resume Parsing & Matching**:
-   - Automated PDF/DOCX parsing using OpenAI or Gemini embeddings to extract candidate skills, experience, and match score against job descriptions.
-2. **Real-time Collaboration via WebSockets / Supabase Realtime**:
-   - Live cursor presence and instant Kanban updates across multiple hiring team members without manual page refreshes.
-3. **Automated Email & Calendar Pipeline**:
-   - Automated candidate notification emails upon status changes (e.g., Interview invitation, Offer letter) and Google/Outlook Calendar scheduling integration.
-4. **Role-Based Access Control (RBAC)**:
-   - Multi-role permissions matrix (Admin, Senior Recruiter, Hiring Manager, Reviewer) with granular action permissions.
-5. **Cursor-Based Keyset Pagination**:
-   - Transition high-volume endpoints from offset (`skip/take`) to cursor keyset pagination for scaling to millions of records with constant `O(1)` query performance.
