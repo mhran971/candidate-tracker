@@ -8,17 +8,18 @@ declare module 'fastify' {
   }
 }
 
+const DEFAULT_DATABASE_URL =
+  'postgresql://postgres.cxqvptwxenshwuxlbenw:mH671939200%25@aws-0-ap-southeast-2.pooler.supabase.com:6543/postgres?pgbouncer=true';
+
 // Global cached Prisma instance to reuse connection pools across serverless function invocations
 let globalPrisma: PrismaClient | undefined;
 
 function getPrismaClient(): PrismaClient {
   if (!globalPrisma) {
-    let dbUrl = process.env.DATABASE_URL?.trim().replace(/^["']|["']$/g, '');
-    if (dbUrl) {
-      process.env.DATABASE_URL = dbUrl;
-    }
+    let dbUrl = (process.env.DATABASE_URL || DEFAULT_DATABASE_URL).trim().replace(/^["']|["']$/g, '');
+    process.env.DATABASE_URL = dbUrl;
     globalPrisma = new PrismaClient({
-      datasources: dbUrl ? { db: { url: dbUrl } } : undefined,
+      datasources: { db: { url: dbUrl } },
       log: process.env.NODE_ENV === 'development' ? ['warn', 'error'] : ['error'],
     });
   }
