@@ -2,28 +2,15 @@ import { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import {
   candidateParamsSchema,
   updateCandidateSchema,
-  candidateSchema,
-  apiErrorResponseSchema,
 } from '@candidate-tracker/shared';
-import { z } from 'zod';
 
 export const updateCandidateRoute: FastifyPluginAsyncZod = async (fastify) => {
   fastify.patch(
     '/:id',
     {
       schema: {
-        tags: ['Candidates'],
-        summary: 'Update an existing candidate',
         params: candidateParamsSchema,
         body: updateCandidateSchema,
-        response: {
-          200: z.object({
-            data: candidateSchema,
-          }),
-          400: apiErrorResponseSchema,
-          404: apiErrorResponseSchema,
-          409: apiErrorResponseSchema,
-        },
       },
     },
     async (request, reply) => {
@@ -39,21 +26,25 @@ export const updateCandidateRoute: FastifyPluginAsyncZod = async (fastify) => {
         return reply.status(404).send({
           statusCode: 404,
           error: 'Not Found',
-          message: `Candidate with ID ${id} not found`,
+          message: 'Candidate not found',
         });
       }
 
-      // If email is being changed, verify uniqueness
+      // If email is being updated, verify uniqueness
       if (body.email && body.email !== existing.email) {
-        const emailExists = await fastify.prisma.candidate.findUnique({
-          where: { email: body.email },
+        const emailConflict = await fastify.prisma.candidate.findFirst({
+          where: {
+            email: body.email,
+            id: { not: id },
+            deletedAt: null,
+          },
         });
 
-        if (emailExists && emailExists.id !== id) {
+        if (emailConflict) {
           return reply.status(409).send({
             statusCode: 409,
             error: 'Conflict',
-            message: `A candidate with email "${body.email}" already exists`,
+            message: 'A candidate with this email address already exists',
           });
         }
       }
@@ -65,7 +56,9 @@ export const updateCandidateRoute: FastifyPluginAsyncZod = async (fastify) => {
           ...(body.email !== undefined && { email: body.email }),
           ...(body.phone !== undefined && { phone: body.phone }),
           ...(body.location !== undefined && { location: body.location }),
-          ...(body.linkedinUrl !== undefined && { linkedinUrl: body.linkedinUrl }),
+          ...(body.linkedinUrl !== undefined && {
+            linkedinUrl: body.linkedinUrl ? body.linkedinUrl : null,
+          }),
           ...(body.notes !== undefined && { notes: body.notes }),
         },
       });

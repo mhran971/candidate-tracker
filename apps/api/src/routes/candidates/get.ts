@@ -1,30 +1,14 @@
 import { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import {
   candidateParamsSchema,
-  candidateSchema,
-  applicationSchema,
-  apiErrorResponseSchema,
 } from '@candidate-tracker/shared';
-import { z } from 'zod';
-
-const candidateDetailResponseSchema = candidateSchema.extend({
-  applications: z.array(applicationSchema),
-});
 
 export const getCandidateRoute: FastifyPluginAsyncZod = async (fastify) => {
   fastify.get(
     '/:id',
     {
       schema: {
-        tags: ['Candidates'],
-        summary: 'Get candidate by ID with associated applications',
         params: candidateParamsSchema,
-        response: {
-          200: z.object({
-            data: candidateDetailResponseSchema,
-          }),
-          404: apiErrorResponseSchema,
-        },
       },
     },
     async (request, reply) => {
@@ -37,7 +21,7 @@ export const getCandidateRoute: FastifyPluginAsyncZod = async (fastify) => {
         },
         include: {
           applications: {
-            orderBy: { appliedAt: 'desc' },
+            orderBy: { createdAt: 'desc' },
           },
         },
       });
@@ -46,11 +30,11 @@ export const getCandidateRoute: FastifyPluginAsyncZod = async (fastify) => {
         return reply.status(404).send({
           statusCode: 404,
           error: 'Not Found',
-          message: `Candidate with ID ${id} not found`,
+          message: 'Candidate not found',
         });
       }
 
-      return reply.send({ data: candidate as any });
+      return reply.send({ data: candidate });
     }
   );
 };

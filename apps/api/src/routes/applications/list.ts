@@ -1,11 +1,7 @@
 import { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import {
   applicationQuerySchema,
-  applicationWithCandidateSchema,
-  paginationMetaSchema,
-  apiErrorResponseSchema,
 } from '@candidate-tracker/shared';
-import { z } from 'zod';
 import { Prisma } from '@prisma/client';
 
 export const listApplicationsRoute: FastifyPluginAsyncZod = async (fastify) => {
@@ -13,94 +9,84 @@ export const listApplicationsRoute: FastifyPluginAsyncZod = async (fastify) => {
     '/',
     {
       schema: {
-        tags: ['Applications'],
-        summary: 'List applications with cross-entity search and filtering',
-        description:
-          'Searches across both Application fields (jobTitle, company, source, notes) and linked Candidate fields (name, email, location) via server-side SQL JOIN.',
         querystring: applicationQuerySchema,
-        response: {
-          200: z.object({
-            data: z.array(applicationWithCandidateSchema),
-            meta: paginationMetaSchema,
-          }),
-          400: apiErrorResponseSchema,
-        },
       },
     },
     async (request, reply) => {
-      const { page, limit, search, status, candidateId, dateFrom, dateTo, sortBy, sortOrder } =
-        request.query;
+      const {
+        page,
+        limit,
+        search,
+        candidateId,
+        status,
+        dateFrom,
+        dateTo,
+        sortBy,
+        sortOrder,
+      } = request.query;
 
       const skip = (page - 1) * limit;
 
-      // Base query: only include applications belonging to active (non-soft-deleted) candidates
+      // Base condition: candidate must not be soft-deleted
       const where: Prisma.ApplicationWhereInput = {
         candidate: {
           deletedAt: null,
         },
       };
 
-      // Filter by specific candidate
+      // Filter by candidate ID
       if (candidateId) {
         where.candidateId = candidateId;
       }
 
-      // Filter by status enum
+      // Filter by application status
       if (status) {
         where.status = status;
       }
 
-      // Filter by applied_at date range
+      // Date range filter on appliedAt
       if (dateFrom || dateTo) {
-        where.appliedAt = {};
-        if (dateFrom) {
-          where.appliedAt.gte = dateFrom;
-        }
-        if (dateTo) {
-          where.appliedAt.lte = dateTo;
-        }
+        where.appliedAt = {
+          ...(dateFrom && { gte: new Date(dateFrom) }),
+          ...(dateTo && { lte: new Date(dateTo) }),
+        };
       }
 
-      // Cross-entity search: searches across Application + joined Candidate in SQL
+      // Cross-entity search: Search in Application fields AND linked Candidate fields
       if (search && search.trim() !== '') {
-        const searchTerm = search.trim();
+        const query = search.trim();
         where.OR = [
-          // Application table fields
-          { jobTitle: { contains: searchTerm } },
-          { company: { contains: searchTerm } },
-          { source: { contains: searchTerm } },
-          { notes: { contains: searchTerm } },
-          // Joined Candidate table fields (server-side JOIN in Prisma)
+          { jobTitle: { contains: query, mode: 'insensitive' } },
+          { company: { contains: query, mode: 'insensitive' } },
+          { source: { contains: query, mode: 'insensitive' } },
+          { notes: { contains: query, mode: 'insensitive' } },
           {
             candidate: {
-              name: { contains: searchTerm },
+              name: { contains: query, mode: 'insensitive' },
               deletedAt: null,
             },
           },
           {
             candidate: {
-              email: { contains: searchTerm },
+              email: { contains: query, mode: 'insensitive' },
               deletedAt: null,
             },
           },
           {
             candidate: {
-              location: { contains: searchTerm },
+              location: { contains: query, mode: 'insensitive' },
               deletedAt: null,
             },
           },
         ];
       }
 
-      // Order by specification
-      const orderBy: Prisma.ApplicationOrderByWithRelationInput = {};
-      if (sortBy && ['jobTitle', 'company', 'status', 'appliedAt', 'createdAt'].includes(sortBy)) {
-        orderBy[sortBy as 'jobTitle' | 'company' | 'status' | 'appliedAt' | 'createdAt'] = sortOrder;
-      } else {
-        orderBy.appliedAt = 'desc';
-      }
+      // Dynamic sorting
+      const orderBy: Prisma.ApplicationOrderByWithRelationInput = {
+        [sortBy as string]: sortOrder,
+      };
 
-      // Execute SQL COUNT and SELECT queries with JOIN
+      // Execute count and data fetch in parallel
       const [total, applications] = await Promise.all([
         fastify.prisma.application.count({ where }),
         fastify.prisma.application.findMany({
@@ -125,12 +111,14 @@ export const listApplicationsRoute: FastifyPluginAsyncZod = async (fastify) => {
       const totalPages = Math.ceil(total / limit);
 
       return reply.send({
-        data: applications as any,
+        data: applications,
         meta: {
-          total,
           page,
           limit,
+          total,
           totalPages,
+          hasNextPage: page < totalPages,
+          hasPreviousPage: page > 1,
         },
       });
     }

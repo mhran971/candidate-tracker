@@ -1,22 +1,14 @@
 import { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
-import { applicationParamsSchema, apiErrorResponseSchema } from '@candidate-tracker/shared';
-import { z } from 'zod';
+import {
+  applicationParamsSchema,
+} from '@candidate-tracker/shared';
 
 export const deleteApplicationRoute: FastifyPluginAsyncZod = async (fastify) => {
   fastify.delete(
     '/:id',
     {
       schema: {
-        tags: ['Applications'],
-        summary: 'Delete an application',
         params: applicationParamsSchema,
-        response: {
-          200: z.object({
-            message: z.string(),
-            id: z.string().uuid(),
-          }),
-          404: apiErrorResponseSchema,
-        },
       },
     },
     async (request, reply) => {
@@ -30,7 +22,7 @@ export const deleteApplicationRoute: FastifyPluginAsyncZod = async (fastify) => 
         return reply.status(404).send({
           statusCode: 404,
           error: 'Not Found',
-          message: `Application with ID ${id} was not found`,
+          message: 'Application not found',
         });
       }
 
@@ -39,7 +31,7 @@ export const deleteApplicationRoute: FastifyPluginAsyncZod = async (fastify) => 
       });
 
       return reply.send({
-        message: 'Application successfully deleted',
+        message: 'Application deleted successfully',
         id,
       });
     }

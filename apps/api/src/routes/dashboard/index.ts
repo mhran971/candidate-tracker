@@ -1,29 +1,12 @@
 import { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import {
-  dashboardMetricsSchema,
-  apiErrorResponseSchema,
   APPLICATION_STATUSES,
   ApplicationStatus,
 } from '@candidate-tracker/shared';
-import { z } from 'zod';
 
 export const dashboardRoutes: FastifyPluginAsyncZod = async (fastify) => {
   fastify.get(
     '/',
-    {
-      schema: {
-        tags: ['Dashboard'],
-        summary: 'Get aggregated dashboard metrics and chart analytics',
-        description:
-          'Computes total candidates, applications by status, monthly hires, rejection rate, latest activity, and weekly trends via database aggregations.',
-        response: {
-          200: z.object({
-            data: dashboardMetricsSchema,
-          }),
-          500: apiErrorResponseSchema,
-        },
-      },
-    },
     async (_request, reply) => {
       const now = new Date();
       const startOfCurrentMonth = new Date(now.getFullYear(), now.getMonth(), 1);

@@ -1,27 +1,14 @@
 import { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import {
   createApplicationSchema,
-  applicationSchema,
-  apiErrorResponseSchema,
 } from '@candidate-tracker/shared';
-import { z } from 'zod';
 
 export const createApplicationRoute: FastifyPluginAsyncZod = async (fastify) => {
   fastify.post(
     '/',
     {
       schema: {
-        tags: ['Applications'],
-        summary: 'Create a new application',
-        description: 'Creates a new application linked to an existing non-deleted candidate',
         body: createApplicationSchema,
-        response: {
-          201: z.object({
-            data: applicationSchema,
-          }),
-          400: apiErrorResponseSchema,
-          404: apiErrorResponseSchema,
-        },
       },
     },
     async (request, reply) => {
@@ -39,7 +26,7 @@ export const createApplicationRoute: FastifyPluginAsyncZod = async (fastify) => 
         return reply.status(404).send({
           statusCode: 404,
           error: 'Not Found',
-          message: `Candidate with ID ${body.candidateId} was not found`,
+          message: `Candidate with ID ${body.candidateId} not found`,
         });
       }
 
@@ -48,15 +35,15 @@ export const createApplicationRoute: FastifyPluginAsyncZod = async (fastify) => 
           candidateId: body.candidateId,
           jobTitle: body.jobTitle,
           company: body.company,
-          status: body.status || 'applied',
-          appliedAt: body.appliedAt,
+          status: body.status ?? 'applied',
+          appliedAt: body.appliedAt ? new Date(body.appliedAt) : new Date(),
           salaryExpectation: body.salaryExpectation ?? null,
-          source: body.source || null,
-          notes: body.notes || null,
+          source: body.source ?? null,
+          notes: body.notes ?? null,
         },
       });
 
-      return reply.status(201).send({ data: application as any });
+      return reply.status(201).send({ data: application });
     }
   );
 };
