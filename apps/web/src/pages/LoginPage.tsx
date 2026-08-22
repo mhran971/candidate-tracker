@@ -5,16 +5,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/layout/ThemeToggle';
-import { Sparkles, Lock, Mail, Loader2, ShieldCheck, AlertCircle, UserPlus, LogIn } from 'lucide-react';
+import { Sparkles, Lock, Mail, Loader2, ShieldCheck, AlertCircle, LogIn, KeyRound } from 'lucide-react';
 import toast from 'react-hot-toast';
 
+const AUTHORIZED_ADMIN_EMAIL = 'mhranabwdqt971@gmail.com';
+
 export function LoginPage() {
-  const { user, signIn, signUp, isLoading } = useAuth();
+  const { user, signIn, isLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [mode, setMode] = useState<'signin' | 'signup'>('signin');
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(AUTHORIZED_ADMIN_EMAIL);
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -29,37 +30,29 @@ export function LoginPage() {
     e.preventDefault();
     setErrorMessage(null);
 
-    if (!email || !password) {
-      setErrorMessage('Please enter both email and password.');
+    const cleanEmail = email.trim().toLowerCase();
+
+    if (!cleanEmail || !password) {
+      setErrorMessage('Please enter both your administrator email and password.');
       return;
     }
 
-    if (password.length < 6) {
-      setErrorMessage('Password must be at least 6 characters.');
+    if (cleanEmail !== AUTHORIZED_ADMIN_EMAIL.toLowerCase()) {
+      setErrorMessage('Access denied: This dashboard is private and restricted exclusively to the authorized platform owner.');
+      toast.error('Unauthorized email address');
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      if (mode === 'signin') {
-        const { error } = await signIn(email, password);
-        if (error) {
-          setErrorMessage(error.message);
-          toast.error(error.message);
-        } else {
-          toast.success('Welcome back! Authentication successful.');
-          navigate(from, { replace: true });
-        }
+      const { error } = await signIn(cleanEmail, password);
+      if (error) {
+        setErrorMessage(error.message);
+        toast.error(error.message);
       } else {
-        const { error } = await signUp(email, password);
-        if (error) {
-          setErrorMessage(error.message);
-          toast.error(error.message);
-        } else {
-          toast.success('Account created! Logging you in...');
-          navigate(from, { replace: true });
-        }
+        toast.success(`Welcome back, Mahran! Access granted.`);
+        navigate(from, { replace: true });
       }
     } finally {
       setIsSubmitting(false);
@@ -93,47 +86,17 @@ export function LoginPage() {
         </div>
 
         {/* Auth Card */}
-        <Card className="border-border shadow-xl backdrop-blur-md bg-card/90">
+        <Card className="border-border shadow-xl backdrop-blur-md bg-card/95">
           <CardHeader className="pb-4">
-            <div className="flex rounded-lg bg-muted p-1 border border-border">
-              <button
-                type="button"
-                onClick={() => {
-                  setMode('signin');
-                  setErrorMessage(null);
-                }}
-                className={`flex-1 flex items-center justify-center gap-2 py-1.5 text-xs font-bold rounded-md transition-all ${
-                  mode === 'signin'
-                    ? 'bg-card text-foreground shadow-xs'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                <LogIn className="h-3.5 w-3.5" />
-                Sign In
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setMode('signup');
-                  setErrorMessage(null);
-                }}
-                className={`flex-1 flex items-center justify-center gap-2 py-1.5 text-xs font-bold rounded-md transition-all ${
-                  mode === 'signup'
-                    ? 'bg-card text-foreground shadow-xs'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                <UserPlus className="h-3.5 w-3.5" />
-                Create Account
-              </button>
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary/10 border border-primary/20 text-primary text-xs font-bold w-fit">
+              <KeyRound className="h-3.5 w-3.5" />
+              <span>Owner Access Only</span>
             </div>
-            <CardTitle className="text-lg font-bold mt-4">
-              {mode === 'signin' ? 'Sign in to your account' : 'Setup your Administrator account'}
+            <CardTitle className="text-lg font-bold mt-2">
+              Administrator Sign In
             </CardTitle>
             <CardDescription className="text-xs">
-              {mode === 'signin'
-                ? 'Enter your administrator credentials to access the recruitment platform.'
-                : 'Create your private credentials for full access.'}
+              Enter your credentials to access your recruitment pipeline and candidates data.
             </CardDescription>
           </CardHeader>
 
@@ -149,19 +112,18 @@ export function LoginPage() {
               {/* Email Input */}
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                  Email Address
+                  Administrator Email
                 </label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground pointer-events-none" />
                   <Input
                     type="email"
-                    placeholder="admin@yourcompany.com"
+                    placeholder="mhranabwdqt971@gmail.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     disabled={isSubmitting}
                     className="pl-9 h-10 text-sm font-medium bg-background"
-                    autoFocus
                   />
                 </div>
               </div>
@@ -169,7 +131,7 @@ export function LoginPage() {
               {/* Password Input */}
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                  Password
+                  Master Password
                 </label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground pointer-events-none" />
@@ -181,6 +143,7 @@ export function LoginPage() {
                     required
                     disabled={isSubmitting}
                     className="pl-9 h-10 text-sm font-medium bg-background"
+                    autoFocus
                   />
                 </div>
               </div>
@@ -196,15 +159,10 @@ export function LoginPage() {
                     <Loader2 className="h-4 w-4 animate-spin" />
                     <span>Authenticating...</span>
                   </>
-                ) : mode === 'signin' ? (
+                ) : (
                   <>
                     <LogIn className="h-4 w-4" />
                     <span>Sign In to Dashboard</span>
-                  </>
-                ) : (
-                  <>
-                    <UserPlus className="h-4 w-4" />
-                    <span>Register Administrator</span>
                   </>
                 )}
               </Button>
