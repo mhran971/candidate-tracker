@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { paginationQuerySchema } from './common.schema.js';
 
 export const candidateSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().min(1),
   name: z.string().min(1, 'Name is required').max(100, 'Name is too long').trim(),
   email: z.string().email('Invalid email address').toLowerCase().trim(),
   phone: z.string().max(50).trim().nullable().optional(),
@@ -39,7 +39,7 @@ export const createCandidateSchema = candidateSchema
 export const updateCandidateSchema = createCandidateSchema.partial();
 
 export const candidateParamsSchema = z.object({
-  id: z.string().uuid('Invalid candidate ID format'),
+  id: z.string().min(1, 'Invalid candidate ID format'),
 });
 
 export const candidateQuerySchema = paginationQuerySchema.extend({

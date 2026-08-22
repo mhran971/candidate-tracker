@@ -6,8 +6,8 @@ import { candidateSchema } from './candidate.schema.js';
 export const applicationStatusSchema = z.enum(APPLICATION_STATUSES);
 
 export const applicationSchema = z.object({
-  id: z.string().uuid(),
-  candidateId: z.string().uuid('Invalid candidate ID format'),
+  id: z.string().min(1),
+  candidateId: z.string().min(1, 'Invalid candidate ID format'),
   jobTitle: z.string().min(1, 'Job title is required').max(150, 'Job title is too long').trim(),
   company: z.string().min(1, 'Company is required').max(150, 'Company is too long').trim(),
   status: applicationStatusSchema.default('applied'),
@@ -45,11 +45,11 @@ export const createApplicationSchema = applicationSchema
 export const updateApplicationSchema = createApplicationSchema.partial();
 
 export const applicationParamsSchema = z.object({
-  id: z.string().uuid('Invalid application ID format'),
+  id: z.string().min(1, 'Invalid application ID format'),
 });
 
 export const applicationQuerySchema = paginationQuerySchema.extend({
-  candidateId: z.string().uuid().optional(),
+  candidateId: z.string().min(1).optional(),
   status: applicationStatusSchema.optional(),
   dateFrom: z.coerce.date().optional(),
   dateTo: z.coerce.date().optional(),
